@@ -1,6 +1,6 @@
-# Todo App Web Client
+# Todo App (Client + API)
 
-A modern, responsive web client for the Todo API built with Next.js 14, React, TypeScript, Tailwind CSS and shadcn/ui components.
+A full-stack Todo application with both client and server-side implementation built with Next.js 14, React, TypeScript, and Tailwind CSS.
 
 ## Features
 
@@ -10,6 +10,7 @@ A modern, responsive web client for the Todo API built with Next.js 14, React, T
 - 🏷️ Categorize todos
 - 🔖 Add tags to todos
 - 📒 Add memos with rich text content
+- 🌐 Built-in API server with Next.js API routes
 
 ## Tech Stack
 
@@ -47,14 +48,6 @@ npm install
 yarn
 ```
 
-3. Create a `.env.local` file in the root directory and add the following environment variables:
-
-```
-NEXT_PUBLIC_API_URL=https://api.todoapp.com/v1
-```
-
-Replace the URL with your actual Todo API endpoint.
-
 ### Development
 
 Run the development server:
@@ -65,7 +58,7 @@ npm run dev
 yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
 
 ### Build for Production
 
@@ -88,6 +81,11 @@ yarn start
 ```
 ├── src/
 │   ├── app/                 # Next.js App Router
+│   │   ├── api/             # API Routes (Server-side)
+│   │   │   ├── todos/       # Todo API endpoints
+│   │   │   ├── categories/  # Categories API endpoints
+│   │   │   ├── tags/        # Tags API endpoints 
+│   │   │   └── memos/       # Memos API endpoints
 │   ├── components/          # React components
 │   │   ├── ui/              # UI components from shadcn/ui
 │   │   ├── todo/            # Todo-specific components
@@ -96,17 +94,33 @@ yarn start
 │   │   ├── reminder/        # Reminder-specific components
 │   │   └── memo/            # Memo-specific components
 │   ├── hooks/               # Custom React hooks
-│   ├── lib/                 # Utility functions
-│   ├── services/            # API services
+│   ├── lib/                 # Utility functions and database
+│   ├── services/            # API services (Client-side)
 │   ├── stores/              # Zustand stores
 │   └── types/               # TypeScript type definitions
 ├── public/                  # Static files
 └── ...config files
 ```
 
-## API Integration
+## API Implementation
 
-This web client integrates with the Todo App API to fetch and manipulate todos, categories, tags, reminders, and memos. The API endpoints are defined in the services directory and consumed by the Zustand stores.
+The application includes a built-in API server implemented using Next.js API routes. The API routes are located in the `src/app/api` directory and follow a RESTful architecture:
+
+- **GET /api/todos** - Get all todos with optional filters
+- **POST /api/todos** - Create a new todo
+- **GET /api/todos/:id** - Get a specific todo
+- **PUT /api/todos/:id** - Update a specific todo
+- **DELETE /api/todos/:id** - Delete a specific todo
+- **GET /api/todos/:id/reminders** - Get reminders for a specific todo
+- **POST /api/todos/:id/reminders** - Create a reminder for a specific todo
+- **GET /api/categories** - Get all categories
+- **POST /api/categories** - Create a new category
+- **GET /api/tags** - Get all tags
+- **POST /api/tags** - Create a new tag
+- **GET /api/memos/:id** - Get a specific memo
+- **PUT /api/memos/:id** - Update a specific memo
+
+The API uses an in-memory database for persistence during the session. Data is reset when the server restarts.
 
 ## License
 
