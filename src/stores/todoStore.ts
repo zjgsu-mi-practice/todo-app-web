@@ -20,6 +20,7 @@ interface TodoState {
   updateTodo: (id: string, todo: Todo) => Promise<Todo>;
   deleteTodo: (id: string) => Promise<void>;
   setFilter: (filter: 'all' | 'pending' | 'in_progress' | 'completed') => void;
+  clearError: () => void;
 }
 
 const useTodoStore = create<TodoState>((set, get) => ({
@@ -43,17 +44,22 @@ const useTodoStore = create<TodoState>((set, get) => ({
         status: filter,
       });
       
+      // Successfully got a response, even if it's an empty array
       set({
-        todos: response.data,
-        currentPage: response.pagination.page,
-        totalTodos: response.pagination.total,
-        totalPages: Math.ceil(response.pagination.total / response.pagination.limit),
+        todos: response.data || [],
+        currentPage: response.pagination?.page || 1,
+        totalTodos: response.pagination?.total || 0,
+        totalPages: Math.ceil((response.pagination?.total || 0) / (response.pagination?.limit || get().limit)),
         loading: false,
+        error: null  // Clear any existing errors
       });
-    } catch (error) {
+    } catch (error: any) {
+      // Only set error if it's an actual API error, not an empty list
+      console.error('Error fetching todos:', error);
       set({
         loading: false,
-        error: 'Failed to fetch todos',
+        error: error?.error?.message || 'Failed to fetch todos',
+        todos: [] // Ensure we have an empty array in case of error
       });
     }
   },
@@ -75,6 +81,7 @@ const useTodoStore = create<TodoState>((set, get) => ({
       set((state) => ({
         todos: [newTodo, ...state.todos],
         loading: false,
+        error: null
       }));
       return newTodo;
     } catch (error) {
@@ -91,6 +98,7 @@ const useTodoStore = create<TodoState>((set, get) => ({
         todos: state.todos.map((t) => (t.id === id ? updatedTodo : t)),
         currentTodo: state.currentTodo?.id === id ? updatedTodo : state.currentTodo,
         loading: false,
+        error: null
       }));
       return updatedTodo;
     } catch (error) {
@@ -106,6 +114,7 @@ const useTodoStore = create<TodoState>((set, get) => ({
       set((state) => ({
         todos: state.todos.filter((todo) => todo.id !== id),
         loading: false,
+        error: null
       }));
     } catch (error) {
       set({ loading: false, error: 'Failed to delete todo' });
@@ -117,6 +126,10 @@ const useTodoStore = create<TodoState>((set, get) => ({
     set({ currentFilter: filter });
     get().fetchTodos(1);
   },
+  
+  clearError: () => {
+    set({ error: null });
+  }
 }));
 
 export default useTodoStore; 

@@ -4,7 +4,7 @@ import TodoItem from './TodoItem';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import useTodoStore from '@/stores/todoStore';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, AlertTriangle, RefreshCw } from 'lucide-react';
 import TodoCreateForm from './TodoCreateForm';
 import { Dialog, DialogContent, DialogTitle, DialogHeader } from '@/components/ui/dialog';
 
@@ -12,7 +12,7 @@ const TodoList = () => {
   const { 
     todos, loading, error, 
     fetchTodos, deleteTodo, updateTodo, 
-    currentFilter, setFilter 
+    currentFilter, setFilter, clearError 
   } = useTodoStore();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
@@ -35,12 +35,33 @@ const TodoList = () => {
     await updateTodo(id, updatedTodo);
   };
 
+  const handleCreateSuccess = (todo: Todo) => {
+    setIsCreateModalOpen(false);
+    // Optionally refresh the todos list or just rely on the store update
+  };
+
+  // Loading state
   if (loading && todos.length === 0) {
-    return <div className="text-center py-8">Loading todos...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center py-16">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900 mb-4"></div>
+        <p>Loading todos...</p>
+      </div>
+    );
   }
 
-  if (error && todos.length === 0) {
-    return <div className="text-center py-8 text-red-500">Error: {error}</div>;
+  // Error state with retry button
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 text-red-500">
+        <AlertTriangle className="h-12 w-12 mb-4" />
+        <p className="mb-4">{error}</p>
+        <Button variant="outline" onClick={() => fetchTodos()}>
+          <RefreshCw className="w-4 h-4 mr-2" />
+          Retry
+        </Button>
+      </div>
+    );
   }
 
   return (
@@ -73,7 +94,13 @@ const TodoList = () => {
               />
             ))
           ) : (
-            <div className="text-center py-8 text-gray-500">No tasks found.</div>
+            <div className="text-center py-8 text-gray-500">
+              <p className="mb-4">No tasks found.</p>
+              <Button variant="outline" onClick={() => setIsCreateModalOpen(true)}>
+                <Plus className="w-4 h-4 mr-2" />
+                Create your first task
+              </Button>
+            </div>
           )}
         </TabsContent>
         
@@ -139,9 +166,7 @@ const TodoList = () => {
             <DialogTitle>Create New Task</DialogTitle>
           </DialogHeader>
           <TodoCreateForm 
-            onSubmit={(todo) => {
-              setIsCreateModalOpen(false);
-            }}
+            onSubmit={handleCreateSuccess}
             onCancel={() => setIsCreateModalOpen(false)}
           />
         </DialogContent>
