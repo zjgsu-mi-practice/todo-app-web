@@ -122,6 +122,30 @@ The application includes a built-in API server implemented using Next.js API rou
 
 The API uses an in-memory database for persistence during the session. Data is reset when the server restarts.
 
+## API Configuration
+
+This application can work with either:
+
+1. **Built-in API Server**: By default, the application uses its built-in Next.js API routes (`/api/*`) for data storage and retrieval.
+
+2. **External API Server**: You can connect to an external API server by setting the `NEXT_PUBLIC_API_URL` variable in the `.env.local` file:
+
+```
+NEXT_PUBLIC_API_URL=http://external-api-server.com
+```
+
+### Using the Built-in API
+
+The built-in API uses an in-memory database for persistence during the session. Data is reset when the server restarts.
+
+### Using an External API
+
+If you want to use an external API server:
+
+1. Make sure the external API follows the same endpoint structure as documented in the API Implementation section
+2. Set the `NEXT_PUBLIC_API_URL` environment variable in `.env.local`
+3. Run the application as usual
+
 ## License
 
 This project is licensed under the MIT License.
