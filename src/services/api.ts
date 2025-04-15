@@ -3,6 +3,7 @@ import axios from 'axios';
 // Use the API URL from .env.local, falling back to the built-in API if not specified
 const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
+// Export axios instance for tests to verify configuration
 const api = axios.create({
   baseURL: API_URL,
   headers: {
